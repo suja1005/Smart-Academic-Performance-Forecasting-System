@@ -1,0 +1,5 @@
+{
+  "name": "Smart Academic Performance Forecasting System",
+  "description": "An AI-powered dashboard for predicting student academic performance and providing centralized analytics with role-based access for students, faculty, and admins.",
+  "requestFramePermissions": []
+}
