@@ -33,10 +33,18 @@ export interface AcademicDetails {
   previousGPA: number;
 }
 
+export interface Suggestion {
+  title: string;
+  description: string;
+  priority: 'High' | 'Medium' | 'Low';
+  category?: string;
+  actionItems?: string[];
+}
+
 export interface PredictionResult {
   level: PerformanceLevel;
   score: number;
-  suggestions: string[];
+  suggestions: Suggestion[];
   modelUsed: string;
   status?: string;
 }

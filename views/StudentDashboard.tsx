@@ -22,23 +22,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user }) => {
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
-  const [notifications, setNotifications] = useState<any[]>([]);
-
-  useEffect(() => {
-    loadPastPredictions();
-  }, []);
-
-  const loadPastPredictions = async () => {
-    try {
-      const response = await getStudentPredictions(user.id);
-      if (response.success && response.data) {
-        const verified = response.data.filter((p: any) => p.status === 'verified');
-        setNotifications(verified);
-      }
-    } catch (error) {
-      console.error('Error loading past predictions:', error);
-    }
-  };
 
   const handlePredict = async () => {
     setIsPredicting(true);
@@ -153,26 +136,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user }) => {
 
         {/* Prediction Results */}
         <div className="lg:col-span-2 space-y-8">
-          {notifications.length > 0 && (
-            <div className="bg-green-50 p-6 rounded-3xl border border-green-200">
-              <h2 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Faculty Verification Notifications
-              </h2>
-              <div className="space-y-4">
-                {notifications.map((notif, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-green-100 flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-bold text-gray-800">Prediction Verification Approved</p>
-                      <p className="text-xs text-gray-500">Risk Level: {notif.riskLevel} | Date: {new Date(notif.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">Record Verified</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {prediction ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className={`p-8 rounded-3xl border ${
@@ -200,14 +163,48 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user }) => {
                   <Icons.Dashboard />
                   AI Optimization Guide
                 </h3>
-                <ul className="space-y-4">
-                  {prediction.suggestions.map((s, idx) => (
-                    <li key={idx} className="text-sm font-medium flex gap-3 leading-snug">
-                      <span className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center text-[10px] flex-shrink-0">{idx + 1}</span>
-                      {s}
-                    </li>
+                <div className="space-y-4">
+                  {prediction.suggestions.map((s: any, idx: number) => (
+                    <div key={idx} className="bg-white/10 p-5 rounded-2xl flex flex-col gap-3 relative group overflow-hidden border border-white/5">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
+                      <div className="flex items-center justify-between relative z-10">
+                        <div className="flex items-center gap-3">
+                          <span className="w-8 h-8 bg-white shadow-sm rounded-xl flex items-center justify-center text-xs font-black text-primary flex-shrink-0">{idx + 1}</span>
+                          <div>
+                            <h4 className="font-bold text-sm text-white">{s.title || 'Guidance'}</h4>
+                            {s.category && <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{s.category}</p>}
+                          </div>
+                        </div>
+                        {s.priority && (
+                          <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider flex-shrink-0 ${
+                            s.priority === 'High' ? 'bg-red-500/80 text-white' : 
+                            s.priority === 'Medium' ? 'bg-orange-500/80 text-white' : 
+                            'bg-green-500/80 text-white'
+                          }`}>
+                            {s.priority}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-white/90 font-medium leading-relaxed mt-1 relative z-10 ml-11">
+                        {s.description || s}
+                      </p>
+                      
+                      {s.actionItems && s.actionItems.length > 0 && (
+                        <div className="ml-11 mt-2 relative z-10">
+                          <p className="text-[10px] font-bold text-white/50 mb-2 uppercase tracking-widest">Tactical Steps</p>
+                          <ul className="space-y-2">
+                            {s.actionItems.map((item: string, i: number) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-white/80 font-medium">
+                                <svg className="w-3.5 h-3.5 text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
           ) : (

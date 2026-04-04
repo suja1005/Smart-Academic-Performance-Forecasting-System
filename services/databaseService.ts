@@ -18,7 +18,7 @@ export interface PredictionData {
   prediction: {
     level: string;
     score: number;
-    suggestions: string[];
+    suggestions: any[];
     modelUsed: string;
     status?: string;
   };
@@ -112,6 +112,20 @@ export async function verifyPrediction(id: number) {
     return result;
   } catch (error) {
     console.error('Error verifying prediction:', error);
+    throw error;
+  }
+}
+
+// Mark notification as read
+export async function markNotificationAsRead(id: number) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/predictions/${id}/read`, {
+      method: 'PUT',
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
     throw error;
   }
 }

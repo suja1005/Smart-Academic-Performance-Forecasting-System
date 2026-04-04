@@ -9,15 +9,54 @@ import FacultyDashboard from './views/FacultyDashboard';
 import SuperAdminDashboard from './views/SuperAdminDashboard';
 import Profile from './views/Profile';
 import EditProfile from './views/EditProfile';
+import Notifications from './views/Notifications';
 import { Icons } from './constants';
+import { getStudentPredictions } from './services/databaseService';
 
 const Sidebar = ({ user, logout }: { user: User; logout: () => void }) => {
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user.role === UserRole.STUDENT) {
+      loadUnread();
+    }
+  }, [user]);
+
+  const loadUnread = async () => {
+    try {
+      const response = await getStudentPredictions(user.id);
+      if (response.success && response.data) {
+        const unread = response.data.filter((p: any) => p.status === 'verified' && !p.isRead);
+        setUnreadCount(unread.length);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const menuItems = [
     { label: 'Dashboard', path: '/', icon: <Icons.Dashboard /> },
-    { label: 'Profile', path: '/profile', icon: <Icons.Profile /> },
   ];
+
+  if (user.role === UserRole.STUDENT) {
+    menuItems.push({ 
+      label: 'Notifications', 
+      path: '/notifications', 
+      icon: (
+        <div className="relative">
+          <Icons.Bell />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </div>
+      )
+    });
+  }
+
+  menuItems.push({ label: 'Profile', path: '/profile', icon: <Icons.Profile /> });
 
   if (user.role === UserRole.SUPER_ADMIN) {
     menuItems.push({ label: 'System Analytics', path: '/analytics', icon: <Icons.Chart /> });
@@ -106,6 +145,7 @@ const App: React.FC = () => {
                 } />
                 <Route path="/profile" element={<Profile user={user} />} />
                 <Route path="/edit-profile" element={<EditProfile user={user} />} />
+                <Route path="/notifications" element={user.role === UserRole.STUDENT ? <Notifications user={user} /> : <Navigate to="/" />} />
                 <Route path="/analytics" element={user.role === UserRole.SUPER_ADMIN ? <SuperAdminDashboard user={user} /> : <Navigate to="/" />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

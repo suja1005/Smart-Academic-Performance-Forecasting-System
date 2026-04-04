@@ -34,6 +34,7 @@ db.exec(`
     suggestions TEXT,
     modelUsed TEXT,
     status TEXT DEFAULT 'pending',
+    isRead INTEGER DEFAULT 0,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
   );
@@ -53,6 +54,11 @@ db.exec(`
 // Try to add the 'status' column in case the db was created without it previously
 try {
   db.exec(`ALTER TABLE predictions ADD COLUMN status TEXT DEFAULT 'pending'`);
+} catch (e: any) {}
+
+// Try to add 'isRead' column
+try {
+  db.exec(`ALTER TABLE predictions ADD COLUMN isRead INTEGER DEFAULT 0`);
 } catch (e: any) {}
 
 // Try to add the 'password' column in case the db was created without it previously
@@ -188,7 +194,7 @@ app.put('/api/predictions/:id/verify', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const stmt = db.prepare(`UPDATE predictions SET status = 'verified' WHERE id = ?`);
+    const stmt = db.prepare(`UPDATE predictions SET status = 'verified', updatedAt = CURRENT_TIMESTAMP WHERE id = ?`);
     const result = stmt.run(id);
 
     if (result.changes === 0) {
@@ -202,6 +208,29 @@ app.put('/api/predictions/:id/verify', (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('Error verifying prediction:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 5.b Mark as Read
+app.put('/api/predictions/:id/read', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const stmt = db.prepare(`UPDATE predictions SET isRead = 1 WHERE id = ?`);
+    const result = stmt.run(id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ success: false, error: 'Prediction not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Notification marked as read',
+      changes: result.changes
+    });
+  } catch (error: any) {
+    console.error('Error marking as read:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
