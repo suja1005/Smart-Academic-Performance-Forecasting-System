@@ -17,6 +17,8 @@ export interface User {
   email: string;
   role: UserRole;
   rollNumber?: string;
+  facultyId?: string;
+  adminId?: string;
   department: string;
   phone?: string;
   gender?: string;

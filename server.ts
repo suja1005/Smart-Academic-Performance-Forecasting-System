@@ -66,6 +66,14 @@ try {
   db.exec(`ALTER TABLE users ADD COLUMN password TEXT`);
 } catch (e: any) {}
 
+try {
+  db.exec(`ALTER TABLE users ADD COLUMN facultyId TEXT`);
+} catch (e: any) {}
+
+try {
+  db.exec(`ALTER TABLE users ADD COLUMN adminId TEXT`);
+} catch (e: any) {}
+
 // Routes
 
 // 1. Store Prediction
@@ -257,7 +265,7 @@ app.delete('/api/predictions/:id', (req: Request, res: Response) => {
 // 6. Register User
 app.post('/api/register', (req: Request, res: Response) => {
   try {
-    const { id, name, email, password, role, department, rollNumber } = req.body;
+    const { id, name, email, password, role, department, rollNumber, facultyId, adminId } = req.body;
     
     // Check if email exists
     const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
@@ -266,11 +274,11 @@ app.post('/api/register', (req: Request, res: Response) => {
     }
 
     const stmt = db.prepare(`
-      INSERT INTO users (id, name, email, password, role, department, rollNumber) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO users (id, name, email, password, role, department, rollNumber, facultyId, adminId) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
-    stmt.run(id, name, email, password, role, department, rollNumber);
+    stmt.run(id, name, email, password, role, department, rollNumber || null, facultyId || null, adminId || null);
     
     res.json({ success: true, message: 'User registered successfully' });
   } catch (error: any) {

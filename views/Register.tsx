@@ -12,7 +12,7 @@ interface RegisterProps {
 const Register: React.FC<RegisterProps> = ({ onRegister }) => {
   const [formData, setFormData] = useState({
     fullName: '',
-    rollNumber: '',
+    identifier: '',
     department: DEPARTMENTS[0],
     email: '',
     phone: '',
@@ -37,7 +37,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
       name: formData.fullName,
       email: formData.email,
       role: formData.role,
-      rollNumber: formData.rollNumber,
+      rollNumber: formData.role === UserRole.STUDENT ? formData.identifier : undefined,
+      facultyId: formData.role === UserRole.FACULTY ? formData.identifier : undefined,
+      adminId: formData.role === UserRole.SUPER_ADMIN ? formData.identifier : undefined,
       department: formData.department,
       phone: formData.phone,
       gender: formData.gender,
@@ -66,7 +68,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100 my-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Student Registration</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            {formData.role === UserRole.STUDENT ? 'Student' : formData.role === UserRole.FACULTY ? 'Faculty' : 'Super Admin'} Registration
+          </h2>
           <p className="text-gray-500 mt-2">Create your institutional academic account</p>
         </div>
 
@@ -77,8 +81,10 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Roll Number</label>
-            <input name="rollNumber" type="text" required onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none" />
+            <label className="block text-sm font-medium text-gray-700">
+              {formData.role === UserRole.STUDENT ? 'Roll Number' : formData.role === UserRole.FACULTY ? 'Faculty ID' : 'Admin ID'}
+            </label>
+            <input name="identifier" type="text" required onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary outline-none" />
           </div>
 
           <div className="space-y-2">
@@ -133,7 +139,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
 
           <div className="md:col-span-2 mt-4">
             <button type="submit" className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-lg hover:bg-primary-dark transition-all">
-              Register Student Account
+              Register {formData.role === UserRole.STUDENT ? 'Student' : formData.role === UserRole.FACULTY ? 'Faculty' : 'Super Admin'} Account
             </button>
             <p className="text-center mt-4 text-sm text-gray-600">
               Already have an account? <Link to="/login" className="text-primary font-bold hover:underline">Login</Link>
