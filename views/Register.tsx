@@ -55,8 +55,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
       } else {
         alert(response.error || 'Registration failed');
       }
-    } catch (error) {
-      alert("Database error. Unable to register.");
+    } catch (error: any) {
+      console.error('Register failed:', error);
+      alert(error?.message || 'Database error. Unable to register.');
     }
   };
 

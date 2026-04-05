@@ -64,9 +64,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       } else {
         alert(response.error || 'Invalid username or password');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Authentication failed", error);
-      alert('Login failed. Please try again or check the server connection.');
+      alert(error?.message || 'Login failed. Please try again or check the server connection.');
     } finally {
       setIsAuthenticating(false);
     }
