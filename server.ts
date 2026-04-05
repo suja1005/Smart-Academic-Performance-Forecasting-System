@@ -128,12 +128,19 @@ app.post('/api/predictions', (req: Request, res: Response) => {
 // 2. Get All Predictions (Faculty/Admin View)
 app.get('/api/predictions', (req: Request, res: Response) => {
   try {
-    const role = req.query.role as string;
-    
-    let query = 'SELECT * FROM predictions ORDER BY createdAt DESC';
-    
+    const department = req.query.department as string;
+    let query = 'SELECT * FROM predictions';
+    const params: any[] = [];
+
+    if (department) {
+      query += ' WHERE department = ?';
+      params.push(department);
+    }
+
+    query += ' ORDER BY createdAt DESC';
+
     const stmt = db.prepare(query);
-    const predictions = stmt.all();
+    const predictions = params.length ? stmt.all(...params) : stmt.all();
 
     res.json({
       success: true,
@@ -201,6 +208,20 @@ app.get('/api/analytics', (req: Request, res: Response) => {
 app.put('/api/predictions/:id/verify', (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const department = req.query.department as string;
+
+    if (!department) {
+      return res.status(400).json({ success: false, error: 'Faculty department is required for verification' });
+    }
+
+    const existing = db.prepare('SELECT department FROM predictions WHERE id = ?').get(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, error: 'Prediction not found' });
+    }
+
+    if (existing.department !== department) {
+      return res.status(403).json({ success: false, error: 'Cannot verify predictions outside your department' });
+    }
 
     const stmt = db.prepare(`UPDATE predictions SET status = 'verified', updatedAt = CURRENT_TIMESTAMP WHERE id = ?`);
     const result = stmt.run(id);

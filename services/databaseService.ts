@@ -52,9 +52,12 @@ export async function storePrediction(data: PredictionData) {
 }
 
 // Get all predictions (Faculty/Admin view)
-export async function getAllPredictions() {
+export async function getAllPredictions(department?: string) {
   try {
-    const response = await fetch(`${API_BASE_URL}/predictions`);
+    const url = department
+      ? `${API_BASE_URL}/predictions?department=${encodeURIComponent(department)}`
+      : `${API_BASE_URL}/predictions`;
+    const response = await fetch(url);
     const result = await response.json();
     return result;
   } catch (error) {
@@ -102,9 +105,12 @@ export async function deletePrediction(id: number) {
 }
 
 // Verify prediction
-export async function verifyPrediction(id: number) {
+export async function verifyPrediction(id: number, department?: string) {
   try {
-    const response = await fetch(`${API_BASE_URL}/predictions/${id}/verify`, {
+    const url = department
+      ? `${API_BASE_URL}/predictions/${id}/verify?department=${encodeURIComponent(department)}`
+      : `${API_BASE_URL}/predictions/${id}/verify`;
+    const response = await fetch(url, {
       method: 'PUT',
     });
     const result = await response.json();

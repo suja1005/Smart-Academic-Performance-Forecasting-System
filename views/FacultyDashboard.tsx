@@ -34,7 +34,7 @@ const FacultyDashboard: React.FC<FacultyDashboardProps> = ({ user }) => {
   const loadPredictions = async () => {
     try {
       setLoading(true);
-      const response = await getAllPredictions();
+      const response = await getAllPredictions(user.department);
       if (response.success) {
         setPredictions(response.data);
       }
@@ -47,12 +47,18 @@ const FacultyDashboard: React.FC<FacultyDashboardProps> = ({ user }) => {
 
   const handleVerify = async (id: number) => {
     try {
-      await verifyPrediction(id);
-      setPredictions(predictions.map(p => 
-        p.id === id ? { ...p, status: 'verified' } : p
-      ));
+      const response = await verifyPrediction(id, user.department);
+      if (response.success) {
+        setPredictions(predictions.map(p => 
+          p.id === id ? { ...p, status: 'verified' } : p
+        ));
+      } else {
+        console.error('Verify failed:', response.error || response.message);
+        alert(response.error || response.message || 'Unable to verify this student');
+      }
     } catch (error) {
       console.error('Error verifying prediction:', error);
+      alert('Unable to verify student. Make sure the student is in your department.');
     }
   };
 
