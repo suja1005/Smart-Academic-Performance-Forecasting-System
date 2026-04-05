@@ -151,7 +151,13 @@ export async function registerUser(userData: any) {
       },
       body: JSON.stringify(userData),
     });
+
     const result = await response.json();
+    if (!response.ok) {
+      const errorMessage = result.error || result.message || 'Registration failed';
+      throw new Error(errorMessage);
+    }
+
     return result;
   } catch (error) {
     console.error('Error registering user:', error);
@@ -169,7 +175,13 @@ export async function loginUser(credentials: any) {
       },
       body: JSON.stringify(credentials),
     });
+
     const result = await response.json();
+    if (!response.ok) {
+      const errorMessage = result.error || result.message || 'Login failed';
+      throw new Error(errorMessage);
+    }
+
     return result;
   } catch (error) {
     console.error('Error logging in user:', error);
