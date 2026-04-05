@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -315,6 +315,13 @@ app.post('/api/login', (req: Request, res: Response) => {
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// Serve Vite Frontend (Production mode)
+const distPath = path.join(__dirname, 'dist');
+app.use(express.static(distPath));
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Start server
