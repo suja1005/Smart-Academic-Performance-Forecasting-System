@@ -138,10 +138,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-xs text-gray-500">
-          First time here? <Link to="/register" className="text-primary font-bold hover:underline">Create Account</Link>
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-700 font-semibold">Don't have an account yet?</p>
+          <Link to="/register" className="inline-block mt-2 px-6 py-3 rounded-full bg-primary text-white font-bold hover:bg-primary-dark transition-all">
+            Create Account
+          </Link>
           <div className="mt-4">
-            <p className="text-[10px] text-gray-400">Secure access via Google Cloud Billing</p>
+            <p className="text-[11px] text-gray-400">Secure access via Google Cloud Billing</p>
           </div>
         </div>
       </div>
