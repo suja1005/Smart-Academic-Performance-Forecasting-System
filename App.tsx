@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import { User, UserRole } from './types';
-import Login from './views/Login';
-import Register from './views/Register';
+import Auth from './views/Auth';
 import StudentDashboard from './views/StudentDashboard';
 import FacultyDashboard from './views/FacultyDashboard';
 import SuperAdminDashboard from './views/SuperAdminDashboard';
@@ -153,9 +152,7 @@ const App: React.FC = () => {
           </div>
         ) : (
           <Routes>
-            <Route path="/login" element={<Login onLogin={login} />} />
-            <Route path="/register" element={<Register onRegister={login} />} />
-            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="*" element={<Auth onAuth={login} />} />
           </Routes>
         )}
       </div>
