@@ -3,6 +3,17 @@ import { UserRole, User } from '../types';
 import { DEPARTMENTS, BATCHES } from '../constants';
 import { registerUser, loginUser } from '../services/databaseService';
 
+interface AIStudio {
+  hasSelectedApiKey: () => Promise<boolean>;
+  openSelectKey: () => Promise<void>;
+}
+
+declare global {
+  interface Window {
+    aistudio: AIStudio;
+  }
+}
+
 interface AuthProps {
   onAuth: (user: User) => void;
 }
@@ -388,14 +399,5 @@ const Auth: React.FC<AuthProps> = ({ onAuth }) => {
     </div>
   );
 };
-
-declare global {
-  interface Window {
-    aistudio?: {
-      hasSelectedApiKey: () => Promise<boolean>;
-      openSelectKey: () => Promise<void>;
-    };
-  }
-}
 
 export default Auth;
