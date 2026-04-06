@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserRole, User } from '../types';
 import { DEPARTMENTS, BATCHES } from '../constants';
 import { registerUser } from '../services/databaseService';
@@ -10,6 +10,7 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ onRegister }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     identifier: '',
@@ -50,8 +51,8 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     try {
       const response = await registerUser(newUser);
       if (response.success) {
-        const { password, ...userWithoutPassword } = newUser;
-        onRegister(userWithoutPassword as User);
+        alert('Registration successful! Click OK to go to login page.');
+        navigate('/login');
       } else {
         alert(response.error || 'Registration failed');
       }
